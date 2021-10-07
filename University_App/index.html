@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>University App</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="index.css" />
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <!-- <script src="./index.js"></script> -->
+
+        <!-- Bootstrap CSS -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous"
+        />
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"
+        ></script>
+    </head>
+
+    <body>
+        <nav class="navbar text-white bg-success">
+            <div class="mx-auto">
+                <span class="navbar-brand mb-0 h1">University App</span>
+            </div>
+        </nav>
+        <nav class="nav nav-pills nav-fill">
+            <a class="nav-link active" aria-current="page" href="#search"
+                >Search</a
+            >
+            <a class="nav-link save" href="#save">Add New</a>
+            <!-- <a class="nav-link edit" href="#edit">Edit</a> -->
+            <a class="nav-link delete" href="#delete">Delete</a>
+            <!-- <a
+                class="nav-link disabled"
+                href="#"
+                tabindex="-1"
+                aria-disabled="true"
+                >Disabled</a
+            > -->
+        </nav>
+        <script>
+            $('.nav-link').on('click', function () {
+                $('.nav-link').removeClass('active')
+                $(this).addClass('active')
+                $('#search').addClass('hidden')
+
+                if ($(this).hasClass('save')) {
+                    $('.hidden').css('display', 'none')
+                    $('#addNew').css('display', 'inline')
+                    $('#deleteButton').css('display', 'none')
+                    $('#saveButton').css('display', 'inline')
+                } else if ($(this).hasClass('delete')) {
+                    $('.hidden').css('display', 'none')
+                    $('#addNew').css('display', 'inline')
+                    $('#saveButton').css('display', 'none')
+                    $('#deleteButton').css('display', 'inline')
+                } else {
+                    $('.hidden').css('display', 'none')
+                    $('#search').css('display', 'inline')
+                }
+            })
+        </script>
+        <script></script>
+        <div class="container">
+            <form id="addNew" class="hidden">
+                <div class="form-group">
+                    <label for="universityName">Name</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="universityName"
+                        placeholder="University Name"
+                        required
+                    />
+                    <small id="universityNameHelp" class="text-danger"></small>
+                </div>
+                <div class="form-group">
+                    <label for="universityAddress">Address</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="universityAddress"
+                        placeholder="University Address"
+                        required
+                    />
+                    <small
+                        id="universityAddressHelp"
+                        class="text-danger"
+                    ></small>
+                </div>
+                <div class="form-group">
+                    <label for="universityPhone">Phone</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="universityPhone"
+                        placeholder="University Phone Number"
+                        required
+                    />
+                    <small id="universityPhoneHelp" class="text-danger"></small>
+                </div>
+                <div class="mt-2">
+                    <button
+                        type="submit"
+                        class="btn btn-success"
+                        id="saveButton"
+                    >
+                        Save
+                    </button>
+                    <button
+                        type="submit"
+                        class="btn btn-danger"
+                        id="deleteButton"
+                    >
+                        Delete
+                    </button>
+                </div>
+            </form>
+            <br />
+            <form id="search">
+                <div class="form-group">
+                    <label for="searchUniversity">Search</label>
+                    <input
+                        class="form-control"
+                        type="text"
+                        placeholder="Enter university name"
+                        id="searchUniversity"
+                        required
+                    />
+                    <button
+                        type="button"
+                        id="searchButton"
+                        class="btn btn-success mt-2"
+                    >
+                        Search
+                    </button>
+                    <br />
+                    <button
+                        type="button"
+                        id="displayRecords"
+                        class="btn btn-outline-success mt-2"
+                    >
+                        Display Records
+                    </button>
+                    <br />
+                    <table id="displayTable" class="table-bordered mt-5">
+                        <thead id="tblHead"></thead>
+                        <tbody id="tblBody"></tbody>
+                    </table>
+                </div>
+            </form>
+            <br />
+
+            <script>
+                $('#deleteButton').click(function () {
+                    name = $('#deleteUninversity').val()
+                    if (validation()) {
+                        var obj = {
+                            name: $('#universityName').val(),
+                            phone: $('#universityPhone').val(),
+                            address: $('#universityAddress').val(),
+                        }
+                        console.log(obj)
+
+                        $.post({
+                            url: SERVER_URL + '/university/delete',
+                            contentType: 'application/json',
+                            data: JSON.stringify(obj),
+                            dataType: 'json',
+                            success: function (response) {
+                                alert('Successfully deleted!')
+                            },
+                        }).fail(function (error) {
+                            alert('Error: ' + error.responseText)
+                        })
+                    }
+                })
+            </script>
+        </div>
+
+        <script>
+            function validation() {
+                var name = document.getElementById('universityName').value
+                var address = document.getElementById('universityAddress').value
+                var phone = document.getElementById('universityPhone').value
+
+                var tokens = phone.split('-')
+
+                for (var i = 0; i < tokens.length; i++) {
+                    if (isNaN(tokens[i])) {
+                        alert('Please use only numbers or hyphens!')
+                        $('#universityPhone').focus()
+                        return false
+                    }
+                }
+
+                var firstChar = address.trim().substring(0, 1)
+
+                if (isNaN(firstChar)) {
+                    alert('Address should start with a number')
+                    $('#universityAddress').focus()
+                    return false
+                }
+
+                var pattern = /[a-z]/i
+                if (!pattern.test(address)) {
+                    alert('Address should contain letters!')
+                    $('#universityAddress').focus()
+                    return false
+                }
+                return true
+            }
+
+            const SERVER_URL = 'http://dev.cs.smu.ca:8150'
+            // const SERVER_URL = 'http://localhost:9000'
+            var data = []
+            var resp = []
+            $('#saveButton').click(function () {
+                // validation();
+
+                if (validation()) {
+                    var obj = {
+                        name: $('#universityName').val(),
+                        phone: $('#universityPhone').val(),
+                        address: $('#universityAddress').val(),
+                    }
+                    console.log(obj)
+
+                    $.post({
+                        url: SERVER_URL + '/university',
+                        contentType: 'application/json',
+                        data: JSON.stringify(obj),
+                        dataType: 'json',
+                        success: function (response) {
+                            alert('Successfully added!')
+                        },
+                    }).fail(function (error) {
+                        alert('Error: ' + error.responseText)
+                    })
+                }
+            })
+            $('#searchButton').click(function () {
+                const universityName = $('#searchUniversity').val()
+                $.get({
+                    url: SERVER_URL + '/university/' + universityName,
+                    contentType: 'application/json',
+                    success: function (response) {
+                        var responseLength = response.length
+                        resp = response
+                        if (responseLength == 1) {
+                            alert(responseLength + ' record found')
+                        } else if (responseLength == 0) {
+                            alert('No record found')
+                        } else {
+                            alert(responseLength + ' records found')
+                        }
+                        console.log(response)
+                    },
+                }).fail(function (error) {
+                    alert('Error: ' + error.responseText)
+                })
+
+                // loadTable(response)
+            })
+            $('#displayRecords').click(function () {
+                $('#tblHead').html(
+                    '   <tr>' +
+                        '   <th>Name</th>' +
+                        '   <th>Address</th>' +
+                        '   <th>Phone</th>' +
+                        '   </tr>'
+                )
+                // var row = document.getElementsByTagName('tbody')[0]
+
+                // function deleteRow() {
+                //     row.parentNode.removeChild(row)
+                // }
+                // deleteRow()
+                // row.parentNode.appendChild(row)
+                // $('#displayTable').html('<tbody id="tblBody"></tbody>')
+                const table = document.getElementById('tblBody')
+                table.innerHTML = ''
+                console.log(resp)
+                for (var i = 0; i < resp.length; i++) {
+                    var name = resp[i].name
+                    var address = resp[i].address
+                    var phone = resp[i].phone
+
+                    var r = table.insertRow()
+                    r.insertCell(-1).innerHTML = name
+                    r.insertCell(-1).innerHTML = address
+                    r.insertCell(-1).innerHTML = phone
+                }
+            })
+        </script>
+    </body>
+</html>
